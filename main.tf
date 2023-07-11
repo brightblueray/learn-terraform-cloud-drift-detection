@@ -1,5 +1,17 @@
 provider "aws" {
   region = var.aws_region
+
+  default_tags {
+    tags = {
+      Workspace = "learn-terraform-cloud-drift-detection"
+      TTL = "7/7/2023"
+      Environment = "Demo"
+      IAC = "Managed by Terraform Cloud"
+      Name = "CH Demo"
+      Project = "CH-IAC-1234"
+      "Cost Center" = "CH-ITO"
+    }
+  }
 }
 
 data "aws_availability_zones" "available" {
@@ -10,6 +22,17 @@ data "aws_availability_zones" "available" {
     values = ["availability-zone"]
   }
 }
+
+data "aws_key_pair" "example" {
+  key_name           = "rkr-key"
+  # include_public_key = true
+
+  # filter {
+  #   name   = "tag:Component"
+  #   values = ["web"]
+  # }
+}
+
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
@@ -34,6 +57,7 @@ resource "aws_security_group" "bastion" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
+    # THIS DOES NOT INCLUDE MY IP ADDRESS
     cidr_blocks = ["192.80.0.0/16"]
   }
 
@@ -61,4 +85,5 @@ resource "aws_instance" "bastion" {
 
   subnet_id              = module.vpc.public_subnets[0]
   vpc_security_group_ids = [aws_security_group.bastion.id]
+  key_name = data.aws_key_pair.example.key_name
 }
