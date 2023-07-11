@@ -57,8 +57,8 @@ resource "aws_security_group" "bastion" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    # THIS DOES NOT INCLUDE MY IP ADDRESS
-    cidr_blocks = ["192.80.0.0/16"]
+    # THIS DOES NOT INCLUDE MY IP ADDRESS, but now it does
+    cidr_blocks = ["65.60.165.105/32"]
   }
 
   egress {
